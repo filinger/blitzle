@@ -16,11 +16,6 @@ DotaPlayerDetector::~DotaPlayerDetector()
 {
 }
 
-void DotaPlayerDetector::controlsCallback(int, void* context)
-{
-	// Do nothing, we'll process updates on next frame acquisition.
-}
-
 void DotaPlayerDetector::init()
 {
 	namedWindow(dota::control_window, WINDOW_AUTOSIZE);
@@ -72,11 +67,11 @@ void DotaPlayerDetector::addControls() {
 	const int sv_max = 255;
 	const int dilate_max = 100;
 
-	createTrackbar("H1", dota::control_window, &hsvRange.from.h, h_max, controlsCallback, this);
-	createTrackbar("S1", dota::control_window, &hsvRange.from.s, sv_max, controlsCallback, this);
-	createTrackbar("V1", dota::control_window, &hsvRange.from.v, sv_max, controlsCallback, this);
-	createTrackbar("H2", dota::control_window, &hsvRange.to.h, h_max, controlsCallback, this);
-	createTrackbar("S2", dota::control_window, &hsvRange.to.s, sv_max, controlsCallback, this);
-	createTrackbar("V2", dota::control_window, &hsvRange.to.v, sv_max, controlsCallback, this);
-	createTrackbar("Dilate Size", dota::control_window, &dilateSize, dilate_max, controlsCallback, this);
+	createTrackbar("H1", dota::control_window, &hsvRange.from.h, h_max, nopCallback, this);
+	createTrackbar("S1", dota::control_window, &hsvRange.from.s, sv_max, nopCallback, this);
+	createTrackbar("V1", dota::control_window, &hsvRange.from.v, sv_max, nopCallback, this);
+	createTrackbar("H2", dota::control_window, &hsvRange.to.h, h_max, nopCallback, this);
+	createTrackbar("S2", dota::control_window, &hsvRange.to.s, sv_max, nopCallback, this);
+	createTrackbar("V2", dota::control_window, &hsvRange.to.v, sv_max, nopCallback, this);
+	createTrackbar("Dilate Size", dota::control_window, &dilateSize, dilate_max, nopCallback, this);
 }

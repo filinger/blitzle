@@ -17,7 +17,7 @@ void drawPlayers(vector<Point>& playersIn, Mat& drawingOut) {
 	}
 }
 
-int main(int argc, char** argv)
+int main1(int argc, char** argv)
 {
 	namedWindow(result_window, WINDOW_AUTOSIZE);
 

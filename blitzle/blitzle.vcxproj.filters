@@ -30,6 +30,12 @@
     <ClCompile Include="IPlayerDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PaladinsPlayerDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="matcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DesktopDuplication.h">
@@ -48,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IPlayerDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PaladinsPlayerDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

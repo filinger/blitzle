@@ -154,6 +154,8 @@
     <ClCompile Include="DotaPlayerDetector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="IPlayerDetector.cpp" />
+    <ClCompile Include="matcher.cpp" />
+    <ClCompile Include="PaladinsPlayerDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdditionalTypes.h" />
@@ -162,6 +164,7 @@
     <ClInclude Include="DesktopSource.h" />
     <ClInclude Include="DotaPlayerDetector.h" />
     <ClInclude Include="IPlayerDetector.h" />
+    <ClInclude Include="PaladinsPlayerDetector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

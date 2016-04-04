@@ -15,11 +15,9 @@ public:
 	DotaPlayerDetector();
 	virtual ~DotaPlayerDetector();
 
-	static void controlsCallback(int, void* context);
-
 	void init();
-	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 	void destroy();
+	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 
 private:
 	HsvRange hsvRange;

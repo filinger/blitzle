@@ -6,12 +6,11 @@
 
 namespace cv
 {
-
 	class DesktopSource
 	{
 	public:
 		DesktopSource(UINT output, UINT timeout);
-		~DesktopSource();
+		virtual ~DesktopSource();
 
 		bool acquireNextFrame(Mat& frameMat);
 

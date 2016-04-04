@@ -151,12 +151,17 @@
   <ItemGroup>
     <ClCompile Include="DesktopDuplication.cpp" />
     <ClCompile Include="DesktopSource.cpp" />
+    <ClCompile Include="DotaPlayerDetector.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="IPlayerDetector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdditionalTypes.h" />
     <ClInclude Include="ComHeaders.h" />
     <ClInclude Include="DesktopDuplication.h" />
     <ClInclude Include="DesktopSource.h" />
+    <ClInclude Include="DotaPlayerDetector.h" />
+    <ClInclude Include="IPlayerDetector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

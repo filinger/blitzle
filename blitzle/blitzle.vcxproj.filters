@@ -24,6 +24,12 @@
     <ClCompile Include="DesktopSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DotaPlayerDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlayerDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DesktopDuplication.h">
@@ -33,6 +39,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DesktopSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DotaPlayerDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AdditionalTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPlayerDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

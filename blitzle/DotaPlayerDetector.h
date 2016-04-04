@@ -15,9 +15,10 @@ public:
 	DotaPlayerDetector();
 	virtual ~DotaPlayerDetector();
 
-	void init();
+	void init(char** argv);
 	void destroy();
 	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
+	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
 	HsvRange hsvRange;

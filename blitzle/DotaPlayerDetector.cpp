@@ -16,7 +16,7 @@ DotaPlayerDetector::~DotaPlayerDetector()
 {
 }
 
-void DotaPlayerDetector::init()
+void DotaPlayerDetector::init(char** argv)
 {
 	namedWindow(dota::control_window, WINDOW_AUTOSIZE);
 	addControls();
@@ -44,6 +44,12 @@ void DotaPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& players
 	findContours(dilated, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
 	showPlayers(contours, playersOut);
+}
+
+void DotaPlayerDetector::processFrameDebug(const Mat& frameIn, Mat& drawingOut)
+{
+	// We could've actually draw some contours for debugging here....
+	frameIn.copyTo(drawingOut);
 }
 
 void DotaPlayerDetector::showPlayers(const vector<vector<Point>>& contoursIn, vector<Point>& playersOut) {

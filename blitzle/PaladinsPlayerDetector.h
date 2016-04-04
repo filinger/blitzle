@@ -15,7 +15,12 @@ public:
 	PaladinsPlayerDetector();
 	virtual ~PaladinsPlayerDetector();
 
-	void init();
+	void init(char** argv);
 	void destroy();
 	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
+	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
+
+private:
+	Mat templ;
+	int thresholdValue = 0;
 };

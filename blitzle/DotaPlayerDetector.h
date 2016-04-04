@@ -18,14 +18,14 @@ public:
 	static void controlsCallback(int, void* context);
 
 	void init();
-	void processFrame(Mat& frame, Mat& output);
+	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 	void destroy();
 
 private:
 	HsvRange hsvRange;
 	int dilateSize;
 
-	void drawPlayers(const Size& size, const vector<vector<Point>>& contours_in, Mat& drawing_out);
-	void dilateRect(int dilate_size, const Mat& filtered_in, Mat& dilated_out);
+	void showPlayers(const vector<vector<Point>>& contoursIn, vector<Point>& playersOut);
+	void dilateRect(int dilateSize, const Mat& filteredIn, Mat& dilatedOut);
 	void addControls();
 };

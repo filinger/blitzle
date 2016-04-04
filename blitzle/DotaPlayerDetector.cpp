@@ -3,7 +3,6 @@
 namespace dota 
 {
 	const char* control_window = "Dota Control";
-	RNG rng(12345);
 }
 
 DotaPlayerDetector::DotaPlayerDetector()
@@ -34,10 +33,10 @@ void DotaPlayerDetector::destroy()
 }
 
 
-void DotaPlayerDetector::processFrame(Mat& frame, Mat& output)
+void DotaPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& playersOut)
 {
 	Mat hsv;
-	cvtColor(frame, hsv, COLOR_BGR2HSV);
+	cvtColor(frameIn, hsv, COLOR_BGR2HSV);
 
 	Mat filtered;
 	inRange(hsv, hsvRange.from.asScalar(), hsvRange.to.asScalar(), filtered);
@@ -49,26 +48,23 @@ void DotaPlayerDetector::processFrame(Mat& frame, Mat& output)
 	vector<Vec4i> hierarchy;
 	findContours(dilated, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
-	drawPlayers(dilated.size(), contours, frame);
-	resize(frame, output, Size(), 0.5, 0.5, INTER_AREA);
+	showPlayers(contours, playersOut);
 }
 
-void DotaPlayerDetector::drawPlayers(const Size& size, const vector<vector<Point>>& contours_in, Mat& drawing_out) {
+void DotaPlayerDetector::showPlayers(const vector<vector<Point>>& contoursIn, vector<Point>& playersOut) {
 	const Point offset = Point(50, 80);
-	const int radius = 50;
 
-	for (size_t i = 0; i < contours_in.size(); i++)
+	for (size_t i = 0; i < contoursIn.size(); i++)
 	{
-		Point bar_begin = contours_in[i][0];
-		Scalar color = Scalar(dota::rng.uniform(0, 255), dota::rng.uniform(0, 255), dota::rng.uniform(0, 255));
-		circle(drawing_out, bar_begin + offset, radius, color, 2);
+		Point bar_begin = contoursIn[i][0];
+		playersOut.push_back(bar_begin + offset);
 	}
 }
 
-void DotaPlayerDetector::dilateRect(int dilate_size, const Mat& filtered_in, Mat& dilated_out) {
-	int rect_size = dilate_size == 0 ? 1 : dilate_size;
+void DotaPlayerDetector::dilateRect(int dilateSize, const Mat& filteredIn, Mat& dilatedOut) {
+	int rect_size = dilateSize == 0 ? 1 : dilateSize;
 	Mat rect_kernel = getStructuringElement(MORPH_RECT, Size(rect_size, 1));
-	dilate(filtered_in, dilated_out, rect_kernel, Point(-1, -1));
+	dilate(filteredIn, dilatedOut, rect_kernel, Point(-1, -1));
 }
 
 void DotaPlayerDetector::addControls() {

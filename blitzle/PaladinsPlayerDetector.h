@@ -21,6 +21,16 @@ public:
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
+	void findHpBarContours(const Mat& frameIn, vector<vector<Point>>& contoursOut);
+
 	Mat hpBarTemplate;
-	int thresholdValue = 0;
+	int thresholdValue = 9300;
+	int thresholdMax = 10000;
+	int minContourArea = 50;
+	int maxContourArea = 300;
+	int contourAreaMax = 500;
+	int contourAreaScale = 1;
+	int dilateX = 1;
+	int dilateY = 4;
+	int dilateMax = 20;
 };

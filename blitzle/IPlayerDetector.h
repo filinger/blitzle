@@ -11,7 +11,7 @@ public:
 	IPlayerDetector();
 	virtual ~IPlayerDetector() = 0;
 
-	virtual void init(char** argv) = 0;
+	virtual void init(int argc, char** argv, bool debugMode) = 0;
 	virtual void destroy() = 0;
 	virtual void processFrame(const Mat& frameIn, vector<Point>& playersOut) = 0;
 	virtual void processFrameDebug(const Mat& frameIn, Mat& drawingOut) = 0;

@@ -132,7 +132,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -154,7 +154,6 @@
     <ClCompile Include="DotaPlayerDetector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="IPlayerDetector.cpp" />
-    <ClCompile Include="matcher.cpp" />
     <ClCompile Include="PaladinsPlayerDetector.cpp" />
   </ItemGroup>
   <ItemGroup>

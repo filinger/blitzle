@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComHeaders.h"
 #include "IPlayerDetector.h"
 #include "AdditionalTypes.h"
 
@@ -15,13 +16,14 @@ public:
 	PaladinsPlayerDetector();
 	virtual ~PaladinsPlayerDetector();
 
-	void init(char** argv);
+	void init(int argc, char** argv, bool debugMode);
 	void destroy();
 	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
 	void findHpBarContours(const Mat& frameIn, vector<vector<Point>>& contoursOut);
+	void addControls();
 
 	Mat hpBarTemplate;
 	int thresholdValue = 9300;

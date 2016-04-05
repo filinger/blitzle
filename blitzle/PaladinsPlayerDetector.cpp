@@ -14,22 +14,27 @@ PaladinsPlayerDetector::~PaladinsPlayerDetector()
 {
 }
 
-void PaladinsPlayerDetector::init(char** argv)
+void PaladinsPlayerDetector::init(int argc, char** argv, bool debugMode)
 {
-	hpBarTemplate = imread(argv[1]);
-	cvtColor(hpBarTemplate, hpBarTemplate, CV_BGR2BGRA); // Template is CV_8UC3 but it should match the frame which is CV_8UC4
+	char* templateOpt = getCmdOption(argv, argv + argc, "-template");
+	if (templateOpt)
+	{
+		hpBarTemplate = imread(templateOpt);
+		cvtColor(hpBarTemplate, hpBarTemplate, CV_BGR2BGRA); // Template is CV_8UC3 but it should match the frame which is CV_8UC4
+	}
+	else
+	{
+		cout << "Paladins detector requires '-template {path_to_hp_template.png}' option specified." << endl;
+		exit(1);
+	}
 
-	namedWindow(paladins::control_window, WINDOW_AUTOSIZE);
-	createTrackbar("Threshold", paladins::control_window, &thresholdValue, thresholdMax, nopCallback, this);
-	createTrackbar("Min Area", paladins::control_window, &minContourArea, contourAreaMax, nopCallback, this);
-	createTrackbar("Max Area", paladins::control_window, &maxContourArea, contourAreaMax, nopCallback, this);
-	createTrackbar("DilateX", paladins::control_window, &dilateX, dilateMax, nopCallback, this);
-	createTrackbar("DilateY", paladins::control_window, &dilateY, dilateMax, nopCallback, this);
+	if (debugMode) {
+		addControls();
+	}
 }
 
 void PaladinsPlayerDetector::destroy()
 {
-	destroyWindow(paladins::control_window);
 }
 
 void PaladinsPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& playersOut)
@@ -83,4 +88,14 @@ void PaladinsPlayerDetector::findHpBarContours(const Mat& frameIn, vector<vector
 
 	vector<Vec4i> hierarchy;
 	findContours(result, contoursOut, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+}
+
+void PaladinsPlayerDetector::addControls()
+{
+	namedWindow(paladins::control_window, WINDOW_AUTOSIZE);
+	createTrackbar("Threshold", paladins::control_window, &thresholdValue, thresholdMax, nopCallback, this);
+	createTrackbar("Min Area", paladins::control_window, &minContourArea, contourAreaMax, nopCallback, this);
+	createTrackbar("Max Area", paladins::control_window, &maxContourArea, contourAreaMax, nopCallback, this);
+	createTrackbar("DilateX", paladins::control_window, &dilateX, dilateMax, nopCallback, this);
+	createTrackbar("DilateY", paladins::control_window, &dilateY, dilateMax, nopCallback, this);
 }

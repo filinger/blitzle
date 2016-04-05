@@ -4,55 +4,137 @@
 
 #include <opencv2/highgui.hpp>
 
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <conio.h>
+
 using namespace cv;
 
-RNG rng(12345);
-char const* result_window = "Result";
+enum BlitzleDetector {
+	DOTA, PALADINS
+};
 
-void drawPlayers(vector<Point>& playersIn, Mat& drawingOut) {
+const std::string BlitzleDetectorStr[] = {
+	"DOTA", "PALADINS"
+};
+
+struct BlitzleOpts {
+	BlitzleDetector detectorType = DOTA;
+	bool drawDebug = false;
+	float outputScale = 0.5f;
+	int duplicationOutput = 0;
+	int duplicationTimeout = 1000;
+};
+
+IPlayerDetector* instantiateDetector(BlitzleDetector detectorType);
+BlitzleOpts parseCmdOptions(int argc, char** argv);
+void drawPlayers(vector<Point>& playersIn, Mat& drawingOut);
+
+RNG rng(12345);
+
+int main(int argc, char** argv)
+{
+#ifdef _DEBUG
+	std::cout << "Waiting for debug attach..." << std::endl;
+	while (!_kbhit()) { }
+#endif
+	
+	BlitzleOpts opts = parseCmdOptions(argc, argv);
+	DesktopSource desktop(opts.duplicationOutput, opts.duplicationTimeout);
+	IPlayerDetector* detector = instantiateDetector(opts.detectorType);
+	detector->init(argc, argv, opts.drawDebug);
+
+	std::string mainWindow = std::string("Blitzle: ") + BlitzleDetectorStr[opts.detectorType];
+	namedWindow(mainWindow, WINDOW_AUTOSIZE);
+
+	int keyPressed = 0;
+	while (keyPressed != 0x1B) // Exit on 'Esc'
+	{
+		Mat frame;
+		desktop.acquireNextFrame(frame);
+
+		Mat result = Mat(frame);
+		if (opts.drawDebug) 
+		{
+			detector->processFrameDebug(frame, result);
+		}
+		else 
+		{
+			vector<Point> players;
+			detector->processFrame(frame, players);
+			drawPlayers(players, result);
+		}
+
+		if (opts.outputScale != 1.0f) 
+		{
+			resize(result, result, Size(), opts.outputScale, opts.outputScale, INTER_AREA);
+		}
+
+		imshow(mainWindow, result);
+		keyPressed = waitKey(1);
+	}
+
+	destroyAllWindows();
+	detector->destroy();
+	delete detector;
+	return 0;
+}
+
+IPlayerDetector* instantiateDetector(BlitzleDetector detectorType)
+{
+	switch (detectorType) 
+	{
+	case PALADINS: return new PaladinsPlayerDetector();
+	case DOTA: return new DotaPlayerDetector();
+	default: return new DotaPlayerDetector();
+	}
+	return nullptr;
+}
+
+BlitzleOpts parseCmdOptions(int argc, char** argv)
+{
+	BlitzleOpts opts;
+	char** end = argv + argc;
+
+	if (cmdOptionExists(argv, end, "-dota"))
+	{
+		opts.detectorType = DOTA;
+	}
+
+	if (cmdOptionExists(argv, end, "-paladins"))
+	{
+		opts.detectorType = PALADINS;
+	}
+
+	if (cmdOptionExists(argv, end, "-debug"))
+	{
+		opts.drawDebug = true;
+	}
+
+	char* outputScaleOpt = getCmdOption(argv, end, "-scale");
+	if (outputScaleOpt)
+	{
+		float outputScale = std::stof(std::string(outputScaleOpt));
+		opts.outputScale = max(min(outputScale, 1.0f), 0.2f);
+	}
+
+	char* duplicationOutputOpt = getCmdOption(argv, end, "-output");
+	if (duplicationOutputOpt)
+	{
+		int duplicationOutput = std::stoi(std::string(duplicationOutputOpt));
+		opts.duplicationOutput = max(duplicationOutput, 0);
+	}
+
+	return opts;
+}
+
+void drawPlayers(vector<Point>& playersIn, Mat& drawingOut) 
+{
 	const int radius = 50;
 	for (size_t i = 0; i < playersIn.size(); i++)
 	{
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 		circle(drawingOut, playersIn[i], radius, color, 2);
 	}
-}
-
-#define DRAW_DEBUG
-#define SCALE_DOWN_OUTPUT
-
-int main(int argc, char** argv)
-{
-	namedWindow(result_window, WINDOW_AUTOSIZE);
-
-	DesktopSource desktop(0, 1000);
-	PaladinsPlayerDetector detector;
-
-	detector.init(argv);
-	while (true) {
-		Mat frame;
-		desktop.acquireNextFrame(frame);
-
-#ifdef DRAW_DEBUG
-		Mat drawing;
-		detector.processFrameDebug(frame, drawing);
-		drawing.copyTo(frame);
-#else
-		vector<Point> players;
-		detector.processFrame(frame, players);
-		drawPlayers(players, frame);
-#endif
-
-#ifdef SCALE_DOWN_OUTPUT
-		resize(frame, frame, Size(), 0.5, 0.5, INTER_AREA);
-#endif
-
-		imshow(result_window, frame);
-		waitKey(1);
-	}
-	detector.destroy();
-
-	waitKey();
-	destroyWindow(result_window);
-	return 0;
 }

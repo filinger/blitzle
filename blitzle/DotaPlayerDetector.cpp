@@ -16,15 +16,16 @@ DotaPlayerDetector::~DotaPlayerDetector()
 {
 }
 
-void DotaPlayerDetector::init(char** argv)
+void DotaPlayerDetector::init(int argc, char** argv, bool debugMode)
 {
-	namedWindow(dota::control_window, WINDOW_AUTOSIZE);
-	addControls();
+	if (debugMode) {
+		namedWindow(dota::control_window, WINDOW_AUTOSIZE);
+		addControls();
+	}
 }
 
 void DotaPlayerDetector::destroy()
 {
-	destroyWindow(dota::control_window);
 }
 
 

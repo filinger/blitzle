@@ -3,6 +3,7 @@ Small PoC for injection-less aimbot.
 
 ## Usage
 `blitzle.exe {args}`
+
 Where 'args' are:
 * -dota : use Dota 2 player detector
 * -paladins : use Paladins player detector
@@ -15,3 +16,5 @@ If '-paladins' detector is chosen, then you must also specify:
 
 Run with no args defaults to:
 `blitzle.exe -dota -scale 0.5f -output 0`
+
+Press `Esc` to exit.

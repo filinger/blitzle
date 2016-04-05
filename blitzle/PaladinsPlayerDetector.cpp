@@ -15,8 +15,8 @@ PaladinsPlayerDetector::~PaladinsPlayerDetector()
 
 void PaladinsPlayerDetector::init(char** argv)
 {
-	templ = imread(argv[1]);
-	cvtColor(templ, templ, CV_BGR2BGRA); // Template is CV_8UC3 but it should match the frame which is CV_8UC4
+	hpBarTemplate = imread(argv[1]);
+	cvtColor(hpBarTemplate, hpBarTemplate, CV_BGR2BGRA); // Template is CV_8UC3 but it should match the frame which is CV_8UC4
 
 	namedWindow(paladins::control_window, WINDOW_AUTOSIZE);
 	createTrackbar("Threshold", paladins::control_window, &thresholdValue, 255, nopCallback, this);
@@ -34,7 +34,7 @@ void PaladinsPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& pla
 void PaladinsPlayerDetector::processFrameDebug(const Mat& frameIn, Mat& drawingOut)
 {
 	Mat matched;
-	matchTemplate(frameIn, templ, drawingOut, TM_CCOEFF_NORMED);
+	matchTemplate(frameIn, hpBarTemplate, drawingOut, TM_CCOEFF_NORMED);
 	//normalize(result, result, 0, 1, NORM_MINMAX, -1, Mat());
 	//threshold(matched, drawingOut, thresholdValue, 255, THRESH_BINARY);
 }

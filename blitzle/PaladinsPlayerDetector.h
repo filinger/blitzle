@@ -21,6 +21,6 @@ public:
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
-	Mat templ;
+	Mat hpBarTemplate;
 	int thresholdValue = 0;
 };

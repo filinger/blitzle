@@ -83,8 +83,8 @@ void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<array<Point2
 		// Note: from horizontal perspective,
 		// rect has swapped width and height,
 		// because it detects it as vertical rectangle with angle == -90 degree. o_O
-		bool correctWidth = rect.size.width > 2 && rect.size.width < 4;
-		bool correctHeight = rect.size.height > 4 && rect.size.height < 80;
+		bool correctWidth = rect.size.width > 1 && rect.size.width < 5;
+		bool correctHeight = rect.size.height > 4 && rect.size.height < 100;
 		bool correctAngle = rect.angle > -91 && rect.angle < -89;
 		if (correctAngle && correctHeight && correctWidth)
 		{

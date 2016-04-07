@@ -24,9 +24,14 @@ protected:
 	D3D11_TEXTURE2D_DESC stagingTexDesc;
 
 private:
+	void reinitialize();
+	void init();
+	void destroy();
+
+	UINT adapter, output, acquireTimeout = 0;
+
 	HRESULT hr = S_OK;
 	UINT subResource = ::D3D11CalcSubresource(0, 0, 1);
-	UINT acquireTimeout;
 
 	ID3D11Device* d3dDevice = nullptr;
 	ID3D11DeviceContext* d3dContext = nullptr;

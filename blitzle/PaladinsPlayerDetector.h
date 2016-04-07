@@ -29,8 +29,8 @@ private:
 	void findPlayerPositions(const vector<array<Point2f, 4>>& barsIn, vector<Point>& positionsOut);
 	void addControls();
 
-	HsvRange lowerHsvRange = { { 0, 190, 205 }, { 2, 205, 225 } };
-	HsvRange higherHsvRange = { { 175, 140, 160 }, { 180, 200, 240 } };
+	HsvRange lowerHsvRange = { { 0, 100, 100 }, { 2, 255, 225 } };
+	HsvRange higherHsvRange = { { 160, 100, 100 }, { 180, 255, 255 } };
 	const int hMax = 180;
 	const int svMax = 255;
 };

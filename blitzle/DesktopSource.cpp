@@ -2,8 +2,8 @@
 
 namespace cv 
 {
-	DesktopSource::DesktopSource(UINT output, UINT timeout)
-		: duplication(output, timeout)
+	DesktopSource::DesktopSource(UINT adapter, UINT output, UINT timeout)
+		: duplication(adapter, output, timeout)
 	{
 	}
 

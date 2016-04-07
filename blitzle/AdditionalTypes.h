@@ -10,7 +10,7 @@ namespace cv
 		int v;
 
 		Scalar asScalar() {
-			return Scalar(h, v, s);
+			return Scalar(h, s, v);
 		}
 	};
 

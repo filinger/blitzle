@@ -1,13 +1,14 @@
 #pragma once
 
 #include <d3d11_2.h>
+#include <dxgi1_3.h>
 
 #include "ComHeaders.h"
 
 class DesktopDuplication
 {
 public:
-	DesktopDuplication(UINT adapterOutput, UINT acquireTimeout);
+	DesktopDuplication(UINT adapter, UINT output, UINT acquireTimeout);
 	virtual ~DesktopDuplication();
 
 	ID3D11Texture2D* acquireNextFrame(DXGI_OUTDUPL_FRAME_INFO& frameInfo);

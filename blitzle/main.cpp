@@ -23,8 +23,9 @@ struct BlitzleOpts {
 	BlitzleDetector detectorType = DOTA;
 	bool drawDebug = false;
 	float outputScale = 0.5f;
+	int duplicationAdapter = 0;
 	int duplicationOutput = 0;
-	int duplicationTimeout = 1000;
+	int duplicationTimeout = 2000;
 };
 
 IPlayerDetector* instantiateDetector(BlitzleDetector detectorType);
@@ -41,12 +42,13 @@ int main(int argc, char** argv)
 #endif
 	
 	BlitzleOpts opts = parseCmdOptions(argc, argv);
-	DesktopSource desktop(opts.duplicationOutput, opts.duplicationTimeout);
+	DesktopSource desktop(opts.duplicationAdapter, opts.duplicationOutput, opts.duplicationTimeout);
 	IPlayerDetector* detector = instantiateDetector(opts.detectorType);
-	detector->init(argc, argv, opts.drawDebug);
 
 	std::string mainWindow = std::string("Blitzle: ") + BlitzleDetectorStr[opts.detectorType];
 	namedWindow(mainWindow, WINDOW_AUTOSIZE);
+
+	detector->init(argc, argv, opts.drawDebug);
 
 	int keyPressed = 0;
 	while (keyPressed != 0x1B) // Exit on 'Esc'
@@ -124,6 +126,13 @@ BlitzleOpts parseCmdOptions(int argc, char** argv)
 	{
 		int duplicationOutput = std::stoi(std::string(duplicationOutputOpt));
 		opts.duplicationOutput = max(duplicationOutput, 0);
+	}
+
+	char* duplicationAdapterOpt = getCmdOption(argv, end, "-adapter");
+	if (duplicationAdapterOpt)
+	{
+		int duplicationAdapter = std::stoi(std::string(duplicationAdapterOpt));
+		opts.duplicationAdapter = max(duplicationAdapter, 0);
 	}
 
 	return opts;

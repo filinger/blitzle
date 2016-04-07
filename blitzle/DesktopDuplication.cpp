@@ -1,12 +1,19 @@
 #include "DesktopDuplication.h"
 
-DesktopDuplication::DesktopDuplication(UINT adapterOutput, UINT acquireTimeout)
+DesktopDuplication::DesktopDuplication(UINT adapter, UINT output, UINT acquireTimeout)
 	: acquireTimeout(acquireTimeout)
 {
-	CHECKED(hr, D3D11CreateDevice(NULL,
-		D3D_DRIVER_TYPE_HARDWARE,
+	IDXGIFactory1* dxgiFactory = nullptr;
+	CHECKED(hr, CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory)));
+
+	IDXGIAdapter1* dxgiAdapter = nullptr;
+	CHECKED(hr, dxgiFactory->EnumAdapters1(adapter, &dxgiAdapter));
+	dxgiFactory->Release();
+
+	CHECKED(hr, D3D11CreateDevice(dxgiAdapter,
+		D3D_DRIVER_TYPE_UNKNOWN,
 		NULL,
-		D3D11_CREATE_DEVICE_DEBUG,
+		NULL,
 		NULL,
 		NULL,
 		D3D11_SDK_VERSION,
@@ -14,23 +21,20 @@ DesktopDuplication::DesktopDuplication(UINT adapterOutput, UINT acquireTimeout)
 		NULL,
 		&d3dContext));
 
-	IDXGIDevice* dxgiDevice = nullptr;
-	CHECKED(hr, d3dDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice)));
-
-	IDXGIAdapter* dxgiAdapter = nullptr;
-	CHECKED(hr, dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&dxgiAdapter)));
-	dxgiDevice->Release();
-
 	IDXGIOutput* dxgiOutput = nullptr;
-	CHECKED(hr, dxgiAdapter->EnumOutputs(adapterOutput, &dxgiOutput));
+	CHECKED(hr, dxgiAdapter->EnumOutputs(output, &dxgiOutput));
 	dxgiAdapter->Release();
 
 	IDXGIOutput1* dxgiOutput1 = nullptr;
 	CHECKED(hr, dxgiOutput->QueryInterface(__uuidof(dxgiOutput1), reinterpret_cast<void**>(&dxgiOutput1)));
 	dxgiOutput->Release();
 
+	IDXGIDevice* dxgiDevice = nullptr;
+	CHECKED(hr, d3dDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice)));
+
 	CHECKED(hr, dxgiOutput1->DuplicateOutput(dxgiDevice, &outputDuplication));
 	dxgiOutput1->Release();
+	dxgiDevice->Release();
 }
 
 

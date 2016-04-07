@@ -1,10 +1,11 @@
 #pragma once
 
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+
 #include "IPlayerDetector.h"
 #include "AdditionalTypes.h"
 
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
 
 using namespace cv;
 using namespace std;

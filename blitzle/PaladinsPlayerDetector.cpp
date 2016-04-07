@@ -3,6 +3,8 @@
 namespace paladins
 {
 	const char* control_window = "Paladins Control";
+	const char* control_window2 = "Paladins Control 2";
+	const char* control_window3 = "Paladins Control 3";
 	RNG rng(12345);
 }
 
@@ -16,19 +18,8 @@ PaladinsPlayerDetector::~PaladinsPlayerDetector()
 
 void PaladinsPlayerDetector::init(int argc, char** argv, bool debugMode)
 {
-	char* templateOpt = getCmdOption(argv, argv + argc, "-template");
-	if (templateOpt)
+	if (debugMode) 
 	{
-		hpBarTemplate = imread(templateOpt);
-		cvtColor(hpBarTemplate, hpBarTemplate, CV_BGR2BGRA); // Template is CV_8UC3 but it should match the frame which is CV_8UC4
-	}
-	else
-	{
-		cout << "Paladins detector requires '-template {path_to_hp_template.png}' option specified." << endl;
-		exit(1);
-	}
-
-	if (debugMode) {
 		addControls();
 	}
 }
@@ -39,63 +30,79 @@ void PaladinsPlayerDetector::destroy()
 
 void PaladinsPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& playersOut)
 {
-	vector<vector<Point>> contours;
-	findHpBarContours(frameIn, contours);
-	/*
-	const Point offset = Point(25, 50);
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		int area = int(contourArea(contours[i]) * contourAreaScale);
-		if (area < minContourArea || area >= maxContourArea) {
-			continue;
-		}
-		Point bar_begin = contours[i][0];
-		playersOut.push_back(bar_begin + offset);
-	}
-	*/
+	Mat filtered;
+	applyFilters(frameIn, filtered);
+
+	vector<array<Point2f, 4>> hpBars;
+	findHpBars(filtered, hpBars);
+
+	findPlayerPositions(hpBars, playersOut);
 }
 
 void PaladinsPlayerDetector::processFrameDebug(const Mat& frameIn, Mat& drawingOut)
 {
+	Mat filtered;
+	applyFilters(frameIn, filtered);
+
 	vector<vector<Point>> contours;
-	findHpBarContours(frameIn, contours);
-	drawingOut = frameIn;
-	for (size_t i = 0; i < contours.size(); i++)
+	findContours(filtered, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+
+	vector<array<Point2f, 4>> hpBars;
+	findHpBars(filtered, hpBars);
+
+	frameIn.copyTo(drawingOut);
+	for (const auto& bar : hpBars)
 	{
-		int area = int(contourArea(contours[i]) * contourAreaScale);
-		if (area < minContourArea || area >= maxContourArea) {
-			continue;
-		}
+		vector<Point2f> barV(bar.begin(), bar.end());
 		Scalar color = Scalar(paladins::rng.uniform(0, 255), paladins::rng.uniform(0, 255), paladins::rng.uniform(0, 255));
-		drawContours(drawingOut, contours, (int)i, color, 2);
+		rectangle(drawingOut, minAreaRect(barV).boundingRect(), color);
 	}
 }
 
-void PaladinsPlayerDetector::findHpBarContours(const Mat& frameIn, vector<vector<Point>>& contoursOut)
+void PaladinsPlayerDetector::applyFilters(const Mat& frameIn, Mat& binaryOut)
 {
-	Mat result;
-	matchTemplate(frameIn, hpBarTemplate, result, TM_CCOEFF_NORMED);
+	Mat hsv;
+	cvtColor(frameIn, hsv, CV_BGR2HSV);
 
-	double normalizedThreshold = (double)thresholdValue / (double)thresholdMax;
-	threshold(result, result, normalizedThreshold, 1.0L, THRESH_BINARY);
+	Mat lowerHue;
+	inRange(hsv, lowerHsvRange.from.asScalar(), lowerHsvRange.to.asScalar(), lowerHue);
 
-	dilateX = max(dilateX, 1);
-	dilateY = max(dilateY, 1);
-	Mat kernel = getStructuringElement(MORPH_RECT, Size(dilateX, dilateY));
-	dilate(result, result, kernel);
+	Mat higherHue;
+	inRange(hsv, higherHsvRange.from.asScalar(), higherHsvRange.to.asScalar(), higherHue);
 
-	result.convertTo(result, CV_8UC1, 255);
+	addWeighted(lowerHue, 1.0, higherHue, 1.0, 0.0, binaryOut);
+}
 
-	vector<Vec4i> hierarchy;
-	findContours(result, contoursOut, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<array<Point2f, 4>>& barsOut)
+{
+	vector<vector<Point>> contours;
+	findContours(binaryIn, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+	for (const auto& contour : contours)
+	{
+		RotatedRect rect = minAreaRect(contour);
+		// Note: from horizontal perspective,
+		// rect has swapped width and height,
+		// because it detects it as vertical rectangle with angle == -90 degree. o_O
+		bool correctWidth = rect.size.width > 2 && rect.size.width < 4;
+		bool correctHeight = rect.size.height > 4 && rect.size.height < 80;
+		bool correctAngle = rect.angle > -91 && rect.angle < -89;
+		if (correctAngle && correctHeight && correctWidth)
+		{
+			array<Point2f, 4> points;
+			rect.points(points.data());
+			barsOut.push_back(points);
+		}
+	}
+}
+
+void PaladinsPlayerDetector::findPlayerPositions(const vector<array<Point2f, 4>>& barsIn, vector<Point>& positionsOut)
+{
+	for (const auto& bar : barsIn)
+	{
+		positionsOut.push_back(Point(int(bar[1].x) + 35, int(bar[1].y) + 60));
+	}
 }
 
 void PaladinsPlayerDetector::addControls()
 {
-	namedWindow(paladins::control_window, WINDOW_AUTOSIZE);
-	createTrackbar("Threshold", paladins::control_window, &thresholdValue, thresholdMax, nopCallback, this);
-	createTrackbar("Min Area", paladins::control_window, &minContourArea, contourAreaMax, nopCallback, this);
-	createTrackbar("Max Area", paladins::control_window, &maxContourArea, contourAreaMax, nopCallback, this);
-	createTrackbar("DilateX", paladins::control_window, &dilateX, dilateMax, nopCallback, this);
-	createTrackbar("DilateY", paladins::control_window, &dilateY, dilateMax, nopCallback, this);
 }

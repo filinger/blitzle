@@ -1,11 +1,13 @@
 #pragma once
 
-#include "ComHeaders.h"
-#include "IPlayerDetector.h"
-#include "AdditionalTypes.h"
+#include <array>
 
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+
+#include "ComHeaders.h"
+#include "IPlayerDetector.h"
+#include "AdditionalTypes.h"
 
 using namespace cv;
 using namespace std;
@@ -22,17 +24,13 @@ public:
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
-	void findHpBarContours(const Mat& frameIn, vector<vector<Point>>& contoursOut);
+	void applyFilters(const Mat& frameIn, Mat& binaryOut);
+	void findHpBars(const Mat& binaryIn, vector<array<Point2f, 4>>& barsOut);
+	void findPlayerPositions(const vector<array<Point2f, 4>>& barsIn, vector<Point>& positionsOut);
 	void addControls();
 
-	Mat hpBarTemplate;
-	int thresholdValue = 9300;
-	int thresholdMax = 10000;
-	int minContourArea = 50;
-	int maxContourArea = 300;
-	int contourAreaMax = 500;
-	int contourAreaScale = 1;
-	int dilateX = 1;
-	int dilateY = 4;
-	int dilateMax = 20;
+	HsvRange lowerHsvRange = { { 0, 190, 205 }, { 2, 205, 225 } };
+	HsvRange higherHsvRange = { { 175, 140, 160 }, { 180, 200, 240 } };
+	const int hMax = 180;
+	const int svMax = 255;
 };

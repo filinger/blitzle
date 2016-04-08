@@ -21,7 +21,8 @@ const std::string BlitzleDetectorStr[] = {
 
 struct BlitzleOpts {
 	BlitzleDetector detectorType = DOTA;
-	bool drawDebug = false;
+	bool withDebug = false;
+	bool withControls = false;
 	float outputScale = 0.5f;
 	int duplicationAdapter = 0;
 	int duplicationOutput = 0;
@@ -48,7 +49,7 @@ int main(int argc, char** argv)
 	std::string mainWindow = std::string("Blitzle: ") + BlitzleDetectorStr[opts.detectorType];
 	namedWindow(mainWindow, WINDOW_AUTOSIZE);
 
-	detector->init(argc, argv, opts.drawDebug);
+	detector->init(argc, argv, opts.withDebug, opts.withControls);
 
 	int keyPressed = 0;
 	while (keyPressed != 0x1B) // Exit on 'Esc'
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
 		desktop.acquireNextFrame(frame);
 
 		Mat result = Mat(frame);
-		if (opts.drawDebug) 
+		if (opts.withDebug) 
 		{
 			detector->processFrameDebug(frame, result);
 		}
@@ -111,7 +112,12 @@ BlitzleOpts parseCmdOptions(int argc, char** argv)
 
 	if (cmdOptionExists(argv, end, "-debug"))
 	{
-		opts.drawDebug = true;
+		opts.withDebug = true;
+	}
+
+	if (cmdOptionExists(argv, end, "-controls"))
+	{
+		opts.withControls = true;
 	}
 
 	char* outputScaleOpt = getCmdOption(argv, end, "-scale");
@@ -141,9 +147,9 @@ BlitzleOpts parseCmdOptions(int argc, char** argv)
 void drawPlayers(vector<Point>& playersIn, Mat& drawingOut) 
 {
 	const int radius = 50;
-	for (size_t i = 0; i < playersIn.size(); i++)
+	for (const auto& player : playersIn)
 	{
 		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		circle(drawingOut, playersIn[i], radius, color, 2);
+		circle(drawingOut, player, radius, color, 2);
 	}
 }

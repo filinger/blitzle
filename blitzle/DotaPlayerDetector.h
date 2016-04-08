@@ -16,16 +16,16 @@ public:
 	DotaPlayerDetector();
 	virtual ~DotaPlayerDetector();
 
-	void init(int argc, char** argv, bool debugMode);
+	void init(int argc, char** argv, bool withDebug = false, bool withControls = false);
 	void destroy();
 	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
 
 private:
-	HsvRange hsvRange;
-	int dilateSize;
-
 	void showPlayers(const vector<vector<Point>>& contoursIn, vector<Point>& playersOut);
 	void dilateRect(int dilateSize, const Mat& filteredIn, Mat& dilatedOut);
 	void addControls();
+
+	HsvRange hsvRange = { { 6, 255, 240 },{ 8, 255, 255 } };
+	int dilateSize = 5;
 };

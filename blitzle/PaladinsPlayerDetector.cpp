@@ -2,9 +2,8 @@
 
 namespace paladins
 {
-	const char* control_window = "Paladins Control";
-	const char* control_window2 = "Paladins Control 2";
-	const char* control_window3 = "Paladins Control 3";
+	const char* lowerHsvControls = "Lower HSV Controls";
+	const char* higherHsvControls = "Higher HSV Controls";
 	RNG rng(12345);
 }
 
@@ -16,9 +15,9 @@ PaladinsPlayerDetector::~PaladinsPlayerDetector()
 {
 }
 
-void PaladinsPlayerDetector::init(int argc, char** argv, bool debugMode)
+void PaladinsPlayerDetector::init(int argc, char** argv, bool withDebug, bool withControls)
 {
-	if (debugMode) 
+	if (withControls)
 	{
 		addControls();
 	}
@@ -44,24 +43,26 @@ void PaladinsPlayerDetector::processFrameDebug(const Mat& frameIn, Mat& drawingO
 	Mat filtered;
 	applyFilters(frameIn, filtered);
 
+	filtered.copyTo(drawingOut);
+	cvtColor(filtered, drawingOut, CV_GRAY2BGR);
+
 	vector<vector<Point>> contours;
 	findContours(filtered, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
 	vector<array<Point2f, 4>> hpBars;
 	findHpBars(filtered, hpBars);
 
-	frameIn.copyTo(drawingOut);
 	for (const auto& bar : hpBars)
 	{
 		vector<Point2f> barV(bar.begin(), bar.end());
-		Scalar color = Scalar(paladins::rng.uniform(0, 255), paladins::rng.uniform(0, 255), paladins::rng.uniform(0, 255));
-		rectangle(drawingOut, minAreaRect(barV).boundingRect(), color);
+		rectangle(drawingOut, minAreaRect(barV).boundingRect(), Scalar(255, 0, 255), 2);
 	}
 }
 
 void PaladinsPlayerDetector::applyFilters(const Mat& frameIn, Mat& binaryOut)
 {
 	Mat hsv;
+	//cv::medianBlur(frameIn, hsv, 3);
 	cvtColor(frameIn, hsv, CV_BGR2HSV);
 
 	Mat lowerHue;
@@ -81,10 +82,10 @@ void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<array<Point2
 	{
 		RotatedRect rect = minAreaRect(contour);
 		// Note: from horizontal perspective,
-		// rect has swapped width and height,
-		// because it detects it as vertical rectangle with angle == -90 degree. o_O
-		bool correctWidth = rect.size.width > 1 && rect.size.width < 5;
-		bool correctHeight = rect.size.height > 4 && rect.size.height < 100;
+		// the rect has swapped width and height,
+		// because it detects it as a vertical rectangle with angle == -90 degree. o_O
+		bool correctWidth = rect.size.width > 1 && rect.size.width < 6;
+		bool correctHeight = rect.size.height > 8 && rect.size.height < 100;
 		bool correctAngle = rect.angle > -91 && rect.angle < -89;
 		if (correctAngle && correctHeight && correctWidth)
 		{
@@ -105,4 +106,22 @@ void PaladinsPlayerDetector::findPlayerPositions(const vector<array<Point2f, 4>>
 
 void PaladinsPlayerDetector::addControls()
 {
+	const int hMax = 180;
+	const int svMax = 255;
+
+	namedWindow(paladins::lowerHsvControls, WINDOW_AUTOSIZE);
+	createTrackbar("H1", paladins::lowerHsvControls, &lowerHsvRange.from.h, hMax, nopCallback, this);
+	createTrackbar("S1", paladins::lowerHsvControls, &lowerHsvRange.from.s, svMax, nopCallback, this);
+	createTrackbar("V1", paladins::lowerHsvControls, &lowerHsvRange.from.v, svMax, nopCallback, this);
+	createTrackbar("H2", paladins::lowerHsvControls, &lowerHsvRange.to.h, hMax, nopCallback, this);
+	createTrackbar("S2", paladins::lowerHsvControls, &lowerHsvRange.to.s, svMax, nopCallback, this);
+	createTrackbar("V2", paladins::lowerHsvControls, &lowerHsvRange.to.v, svMax, nopCallback, this);
+
+	namedWindow(paladins::higherHsvControls, WINDOW_AUTOSIZE);
+	createTrackbar("H1", paladins::higherHsvControls, &higherHsvRange.from.h, hMax, nopCallback, this);
+	createTrackbar("S1", paladins::higherHsvControls, &higherHsvRange.from.s, svMax, nopCallback, this);
+	createTrackbar("V1", paladins::higherHsvControls, &higherHsvRange.from.v, svMax, nopCallback, this);
+	createTrackbar("H2", paladins::higherHsvControls, &higherHsvRange.to.h, hMax, nopCallback, this);
+	createTrackbar("S2", paladins::higherHsvControls, &higherHsvRange.to.s, svMax, nopCallback, this);
+	createTrackbar("V2", paladins::higherHsvControls, &higherHsvRange.to.v, svMax, nopCallback, this);
 }

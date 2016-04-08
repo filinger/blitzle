@@ -18,7 +18,7 @@ public:
 	PaladinsPlayerDetector();
 	virtual ~PaladinsPlayerDetector();
 
-	void init(int argc, char** argv, bool debugMode);
+	void init(int argc, char** argv, bool withDebug=false, bool withControls=false);
 	void destroy();
 	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
 	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
@@ -29,8 +29,6 @@ private:
 	void findPlayerPositions(const vector<array<Point2f, 4>>& barsIn, vector<Point>& positionsOut);
 	void addControls();
 
-	HsvRange lowerHsvRange = { { 0, 100, 100 }, { 2, 255, 225 } };
-	HsvRange higherHsvRange = { { 160, 100, 100 }, { 180, 255, 255 } };
-	const int hMax = 180;
-	const int svMax = 255;
+	HsvRange lowerHsvRange = { { 0, 130, 130 }, { 10, 255, 255 } };
+	HsvRange higherHsvRange = { { 176, 130, 130 }, { 180, 255, 255 } };
 };

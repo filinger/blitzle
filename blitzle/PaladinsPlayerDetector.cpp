@@ -29,40 +29,60 @@ void PaladinsPlayerDetector::destroy()
 
 void PaladinsPlayerDetector::processFrame(const Mat& frameIn, vector<Point>& playersOut)
 {
-	Mat filtered;
-	applyFilters(frameIn, filtered);
+	Mat roi;
+	Rect roiRect;
+	getRoi(frameIn, roi, roiRect);
 
-	vector<array<Point2f, 4>> hpBars;
+	Mat filtered;
+	applyFilters(roi, filtered);
+
+	vector<Rect> hpBars;
 	findHpBars(filtered, hpBars);
 
-	findPlayerPositions(hpBars, playersOut);
+	vector<Point> players;
+	findPlayerPositions(hpBars, players);
+	const Point& roiOffset = Point(roiRect.x, roiRect.y);
+	for (const auto& player : players) {
+		playersOut.push_back(player + roiOffset);
+	}
 }
 
 void PaladinsPlayerDetector::processFrameDebug(const Mat& frameIn, Mat& drawingOut)
 {
+	Mat roi;
+	Rect roiRect;
+	getRoi(frameIn, roi, roiRect);
+
 	Mat filtered;
-	applyFilters(frameIn, filtered);
+	applyFilters(roi, filtered);
 
-	filtered.copyTo(drawingOut);
-	cvtColor(filtered, drawingOut, CV_GRAY2BGR);
-
-	vector<vector<Point>> contours;
-	findContours(filtered, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
-
-	vector<array<Point2f, 4>> hpBars;
+	vector<Rect> hpBars;
 	findHpBars(filtered, hpBars);
 
+	frameIn.copyTo(drawingOut);
+	rectangle(drawingOut, roiRect, Scalar(0, 255, 0), 2);
 	for (const auto& bar : hpBars)
 	{
-		vector<Point2f> barV(bar.begin(), bar.end());
-		rectangle(drawingOut, minAreaRect(barV).boundingRect(), Scalar(255, 0, 255), 2);
+		Rect correctedBar = Rect(bar.x + roiRect.x, bar.y + roiRect.y, bar.width, bar.height);
+		rectangle(drawingOut, correctedBar, Scalar(255, 0, 255), 2);
 	}
+}
+
+void PaladinsPlayerDetector::getRoi(const Mat& frameIn, Mat& roiOut, Rect& roiRectOut)
+{
+	const int width = frameIn.cols;
+	const int height = frameIn.rows;
+	const int roiStartX = int(width * (roiRectNorm.x - roiRectNorm.width / 2.0f));
+	const int roiStartY = int(height * (roiRectNorm.y - roiRectNorm.height / 2.0f));
+	const int roiWidth = int(width * roiRectNorm.width);
+	const int roiHeight = int(height * roiRectNorm.height);
+	roiRectOut = Rect(roiStartX, roiStartY, roiWidth, roiHeight);
+	roiOut = Mat(frameIn, roiRectOut);
 }
 
 void PaladinsPlayerDetector::applyFilters(const Mat& frameIn, Mat& binaryOut)
 {
 	Mat hsv;
-	//cv::medianBlur(frameIn, hsv, 3);
 	cvtColor(frameIn, hsv, CV_BGR2HSV);
 
 	Mat lowerHue;
@@ -74,7 +94,7 @@ void PaladinsPlayerDetector::applyFilters(const Mat& frameIn, Mat& binaryOut)
 	addWeighted(lowerHue, 1.0, higherHue, 1.0, 0.0, binaryOut);
 }
 
-void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<array<Point2f, 4>>& barsOut)
+void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<Rect>& barsOut)
 {
 	vector<vector<Point>> contours;
 	findContours(binaryIn, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
@@ -85,22 +105,22 @@ void PaladinsPlayerDetector::findHpBars(const Mat& binaryIn, vector<array<Point2
 		// the rect has swapped width and height,
 		// because it detects it as a vertical rectangle with angle == -90 degree. o_O
 		bool correctWidth = rect.size.width > 1 && rect.size.width < 6;
-		bool correctHeight = rect.size.height > 8 && rect.size.height < 100;
+		bool correctHeight = rect.size.height > 15 && rect.size.height < 100;
 		bool correctAngle = rect.angle > -91 && rect.angle < -89;
 		if (correctAngle && correctHeight && correctWidth)
 		{
 			array<Point2f, 4> points;
 			rect.points(points.data());
-			barsOut.push_back(points);
+			barsOut.push_back(Rect(points[1], points[3]));
 		}
 	}
 }
 
-void PaladinsPlayerDetector::findPlayerPositions(const vector<array<Point2f, 4>>& barsIn, vector<Point>& positionsOut)
+void PaladinsPlayerDetector::findPlayerPositions(const vector<Rect>& barsIn, vector<Point>& positionsOut)
 {
 	for (const auto& bar : barsIn)
 	{
-		positionsOut.push_back(Point(int(bar[1].x) + 35, int(bar[1].y) + 60));
+		positionsOut.push_back(Point(bar.x + 35, bar.y + 60));
 	}
 }
 

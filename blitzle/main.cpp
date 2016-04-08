@@ -149,7 +149,6 @@ void drawPlayers(vector<Point>& playersIn, Mat& drawingOut)
 	const int radius = 50;
 	for (const auto& player : playersIn)
 	{
-		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		circle(drawingOut, player, radius, color, 2);
+		circle(drawingOut, player, radius, Scalar(255, 0, 255), 4);
 	}
 }

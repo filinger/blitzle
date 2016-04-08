@@ -19,3 +19,9 @@ namespace cv
 		Hsv to;
 	};
 }
+
+inline float euclideanDist(const cv::Point2f& a, const cv::Point2f& b)
+{
+	cv::Point2f diff = a - b;
+	return cv::sqrt(diff.x * diff.x + diff.y * diff.y);
+}

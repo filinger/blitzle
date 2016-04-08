@@ -21,6 +21,11 @@ namespace cv
 		
 		duplication.unmapFrame(frameTex);
 		frameTex->Release();
+		lastFrameInfo = frameInfo;
 		return frameInfo.TotalMetadataBufferSize != 0;
+	}
+	Point DesktopSource::getFramePointer()
+	{
+		return Point(lastFrameInfo.PointerPosition.Position.x, lastFrameInfo.PointerPosition.Position.y);
 	}
 }

@@ -32,5 +32,5 @@ private:
 
 	HsvRange lowerHsvRange = { { 0, 130, 130 }, { 10, 255, 255 } };
 	HsvRange higherHsvRange = { { 176, 130, 130 }, { 180, 255, 255 } };
-	Rect_<float> roiRectNorm = Rect_<float>(0.5f, 0.5f, 0.25f, 0.5f);
+	Rect_<float> roiRectNorm = Rect_<float>(0.5f, 0.5f, 0.2f, 0.3f);
 };

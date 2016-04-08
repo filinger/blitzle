@@ -13,8 +13,10 @@ namespace cv
 		virtual ~DesktopSource();
 
 		bool acquireNextFrame(Mat& frameMat);
+		Point getFramePointer();
 
 	private:
 		DesktopDuplication duplication;
+		DXGI_OUTDUPL_FRAME_INFO lastFrameInfo;
 	};
 }

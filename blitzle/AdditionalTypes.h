@@ -4,24 +4,28 @@
 
 namespace cv
 {
-	struct Hsv {
+	struct FilterValue
+	{
 		int h;
 		int s;
 		int v;
 
-		Scalar asScalar() {
+		Scalar asScalar() const
+		{
 			return Scalar(h, s, v);
 		}
 	};
 
-	struct HsvRange {
-		Hsv from;
-		Hsv to;
+	struct FilterRange
+	{
+		FilterValue from;
+		FilterValue to;
 	};
+
+	inline float euclideanDist(const Point2f& a, const Point2f& b)
+	{
+		Point2f diff = a - b;
+		return sqrt(diff.x * diff.x + diff.y * diff.y);
+	}
 }
 
-inline float euclideanDist(const cv::Point2f& a, const cv::Point2f& b)
-{
-	cv::Point2f diff = a - b;
-	return cv::sqrt(diff.x * diff.x + diff.y * diff.y);
-}

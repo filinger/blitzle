@@ -9,7 +9,7 @@
 
 #define CHECKED(hr, function) { hr = function; CHECK_HR(hr); }
 
-inline void checkHr(HRESULT hr, char const* file, int line) 
+inline void checkHr(HRESULT hr, char const* file, int line)
 {
 	if (!SUCCEEDED(hr))
 	{
@@ -32,5 +32,6 @@ inline char* getCmdOption(char** begin, char** end, const std::string& option)
 	{
 		return *iterator;
 	}
-	return 0;
+	return nullptr;
 }
+

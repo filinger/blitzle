@@ -7,3 +7,4 @@ IPlayerDetector::IPlayerDetector()
 IPlayerDetector::~IPlayerDetector()
 {
 }
+

@@ -4,19 +4,17 @@
 
 #include "DesktopDuplication.h"
 
-namespace cv
+class DesktopSource
 {
-	class DesktopSource
-	{
-	public:
-		DesktopSource(UINT adapter, UINT output, UINT timeout);
-		virtual ~DesktopSource();
+public:
+	DesktopSource(UINT adapter, UINT output, UINT timeout);
+	virtual ~DesktopSource();
 
-		bool acquireNextFrame(Mat& frameMat);
-		Point getFramePointer();
+	bool acquireNextFrame(cv::Mat& frameMat);
+	bool acquireNextFrame(cv::UMat& frameUMat);
+	cv::Point getFramePointer() const;
 
-	private:
-		DesktopDuplication duplication;
-		DXGI_OUTDUPL_FRAME_INFO lastFrameInfo;
-	};
-}
+private:
+	DesktopDuplication duplication;
+	DXGI_OUTDUPL_FRAME_INFO lastFrameInfo;
+};

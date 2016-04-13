@@ -2,10 +2,7 @@
 
 #include <thread>
 #include <mutex>
-#include <tuple>
-#include <algorithm>
 #include <chrono>
-#include <iostream>
 
 #include "deps\interception.h"
 
@@ -26,7 +23,7 @@ public:
 
 	void setTargetDelta(int dx, int dy);
 	void unsetTarget();
-	bool isTargetSet();
+	bool isTargetSet() const;
 
 private:
 	void init();

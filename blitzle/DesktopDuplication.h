@@ -3,8 +3,6 @@
 #include <d3d11_2.h>
 #include <dxgi1_3.h>
 
-#include "ComHeaders.h"
-
 class DesktopDuplication
 {
 public:
@@ -13,13 +11,13 @@ public:
 
 	ID3D11Texture2D* acquireNextFrame(DXGI_OUTDUPL_FRAME_INFO& frameInfo);
 	D3D11_MAPPED_SUBRESOURCE mapFrame(ID3D11Texture2D* frameTex);
-	void unmapFrame(ID3D11Texture2D* frameTex);
-	UINT frameHeight();
-	UINT frameWidth();
+	void unmapFrame(ID3D11Texture2D* frameTex) const;
+	UINT frameHeight() const;
+	UINT frameWidth() const;
 
 protected:
 	ID3D11Texture2D* copyToStaging(ID3D11Texture2D* tex);
-	D3D11_TEXTURE2D_DESC getStagingTexDesc(D3D11_TEXTURE2D_DESC& originalTexDesc);
+	static D3D11_TEXTURE2D_DESC getStagingTexDesc(D3D11_TEXTURE2D_DESC& originalTexDesc);
 
 	D3D11_TEXTURE2D_DESC stagingTexDesc;
 

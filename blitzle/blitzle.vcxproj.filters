@@ -39,6 +39,9 @@
     <ClCompile Include="Interceptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BlitzleApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DesktopDuplication.h">
@@ -68,5 +71,11 @@
     <ClInclude Include="deps\interception.h">
       <Filter>Header Files\deps</Filter>
     </ClInclude>
+    <ClInclude Include="BlitzleApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "DesktopDuplication.h"
+#include "ComHeaders.h"
 
 DesktopDuplication::DesktopDuplication(UINT adapter, UINT output, UINT acquireTimeout)
 	: adapter(adapter), output(output), acquireTimeout(acquireTimeout)
@@ -11,12 +12,13 @@ DesktopDuplication::~DesktopDuplication()
 	destroy();
 }
 
-ID3D11Texture2D*  DesktopDuplication::acquireNextFrame(DXGI_OUTDUPL_FRAME_INFO& frameInfoOut)
+ID3D11Texture2D* DesktopDuplication::acquireNextFrame(DXGI_OUTDUPL_FRAME_INFO& frameInfoOut)
 {
 	IDXGIResource* frameResource;
 	hr = outputDuplication->AcquireNextFrame(acquireTimeout, &frameInfoOut, &frameResource);
 
-	if (hr != S_OK) {
+	if (hr != S_OK)
+	{
 		reinitialize(); // Second chance to recover adapter failure.
 		std::cout << "Next frame acquisition failed: " << hr << ". Reinitializing DXGI subsystems..." << std::endl;
 		CHECKED(hr, outputDuplication->AcquireNextFrame(acquireTimeout, &frameInfoOut, &frameResource));
@@ -34,28 +36,30 @@ ID3D11Texture2D*  DesktopDuplication::acquireNextFrame(DXGI_OUTDUPL_FRAME_INFO& 
 	return frameStagingTex;
 }
 
-D3D11_MAPPED_SUBRESOURCE DesktopDuplication::mapFrame(ID3D11Texture2D* frameTex) {
+D3D11_MAPPED_SUBRESOURCE DesktopDuplication::mapFrame(ID3D11Texture2D* frameTex)
+{
 	D3D11_MAPPED_SUBRESOURCE frameMapped;
 	CHECKED(hr, d3dContext->Map(frameTex, subResource, D3D11_MAP_READ, 0, &frameMapped));
 	return frameMapped;
 }
 
-void DesktopDuplication::unmapFrame(ID3D11Texture2D* frameTex)
+void DesktopDuplication::unmapFrame(ID3D11Texture2D* frameTex) const
 {
 	d3dContext->Unmap(frameTex, subResource);
 }
 
-UINT DesktopDuplication::frameHeight()
+UINT DesktopDuplication::frameHeight() const
 {
 	return stagingTexDesc.Height;
 }
 
-UINT DesktopDuplication::frameWidth()
+UINT DesktopDuplication::frameWidth() const
 {
 	return stagingTexDesc.Width;
 }
 
-ID3D11Texture2D* DesktopDuplication::copyToStaging(ID3D11Texture2D* tex) {
+ID3D11Texture2D* DesktopDuplication::copyToStaging(ID3D11Texture2D* tex)
+{
 	D3D11_TEXTURE2D_DESC texDesc;
 	tex->GetDesc(&texDesc);
 
@@ -65,11 +69,12 @@ ID3D11Texture2D* DesktopDuplication::copyToStaging(ID3D11Texture2D* tex) {
 	CHECKED(hr, d3dDevice->CreateTexture2D(&stagingTexDesc, nullptr, &stagingTex));
 
 	d3dContext->CopyResource(stagingTex, tex);
-	
+
 	return stagingTex;
 }
 
-D3D11_TEXTURE2D_DESC DesktopDuplication::getStagingTexDesc(D3D11_TEXTURE2D_DESC& originalTexDesc) {
+D3D11_TEXTURE2D_DESC DesktopDuplication::getStagingTexDesc(D3D11_TEXTURE2D_DESC& originalTexDesc)
+{
 	D3D11_TEXTURE2D_DESC stagingTexDesc = originalTexDesc;
 	stagingTexDesc.Usage = D3D11_USAGE_STAGING;
 	stagingTexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -129,3 +134,4 @@ void DesktopDuplication::destroy()
 	d3dDevice->Release();
 	d3dContext->Release();
 }
+

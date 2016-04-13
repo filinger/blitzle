@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BlitzleApp.cpp" />
     <ClCompile Include="DesktopDuplication.cpp" />
     <ClCompile Include="DesktopSource.cpp" />
     <ClCompile Include="DotaPlayerDetector.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdditionalTypes.h" />
+    <ClInclude Include="BlitzleApp.h" />
     <ClInclude Include="ComHeaders.h" />
     <ClInclude Include="deps\interception.h" />
     <ClInclude Include="DesktopDuplication.h" />
@@ -168,7 +170,19 @@
     <ClInclude Include="IPlayerDetector.h" />
     <ClInclude Include="PaladinsPlayerDetector.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\opencvcuda-release.redist.3.1.0\build\native\opencvcuda-release.redist.targets" Condition="Exists('..\packages\opencvcuda-release.redist.3.1.0\build\native\opencvcuda-release.redist.targets')" />
+    <Import Project="..\packages\opencvcuda-release.3.1.0\build\native\opencvcuda-release.targets" Condition="Exists('..\packages\opencvcuda-release.3.1.0\build\native\opencvcuda-release.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\opencvcuda-release.redist.3.1.0\build\native\opencvcuda-release.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencvcuda-release.redist.3.1.0\build\native\opencvcuda-release.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\opencvcuda-release.3.1.0\build\native\opencvcuda-release.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencvcuda-release.3.1.0\build\native\opencvcuda-release.targets'))" />
+  </Target>
 </Project>

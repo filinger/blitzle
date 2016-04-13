@@ -1,5 +1,7 @@
 #include "Interceptor.h"
 
+#include <iostream>
+
 Interceptor::Interceptor()
 {
 	init();
@@ -25,7 +27,7 @@ void Interceptor::unsetTarget()
 	targetDeltaY = 0;
 }
 
-bool Interceptor::isTargetSet()
+bool Interceptor::isTargetSet() const
 {
 	return targetDeltaX != 0 && targetDeltaY != 0;
 }
@@ -45,7 +47,7 @@ void Interceptor::destroy()
 
 void Interceptor::run()
 {
-	while (!done && interception_receive(context, device = interception_wait(context), (InterceptionStroke *)&stroke, 1) > 0)
+	while (!done && interception_receive(context, device = interception_wait(context), static_cast<InterceptionStroke *>(&stroke), 1) > 0)
 	{
 		auto t0 = clock::now();
 
@@ -64,10 +66,10 @@ void Interceptor::handleToggle()
 	{
 		interception_send(context, device, &stroke, 1);
 
-		InterceptionKeyStroke &kstroke = *(InterceptionKeyStroke *)&stroke;
+		InterceptionKeyStroke& kstroke = *reinterpret_cast<InterceptionKeyStroke *>(&stroke);
 		if (kstroke.code == SCANCODE_TAB)
 		{
-			enabled =  !enabled;
+			enabled = !enabled;
 			std::cout << "Interceptor: " << (enabled ? "on" : "off") << std::endl;
 		}
 	}
@@ -77,7 +79,7 @@ void Interceptor::handleMouse()
 {
 	if (interception_is_mouse(device))
 	{
-		InterceptionMouseStroke &mstroke = *(InterceptionMouseStroke *)&stroke;
+		InterceptionMouseStroke& mstroke = *reinterpret_cast<InterceptionMouseStroke *>(&stroke);
 
 		if (enabled && isTargetSet() && (!mstroke.flags & INTERCEPTION_MOUSE_MOVE_ABSOLUTE))
 		{
@@ -90,3 +92,4 @@ void Interceptor::handleMouse()
 		interception_send(context, device, &stroke, 1);
 	}
 }
+

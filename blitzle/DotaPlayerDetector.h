@@ -1,14 +1,7 @@
 #pragma once
 
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-
 #include "IPlayerDetector.h"
 #include "AdditionalTypes.h"
-
-
-using namespace cv;
-using namespace std;
 
 class DotaPlayerDetector : public IPlayerDetector
 {
@@ -16,16 +9,19 @@ public:
 	DotaPlayerDetector();
 	virtual ~DotaPlayerDetector();
 
-	void init(int argc, char** argv, bool withDebug = false, bool withControls = false);
-	void destroy();
-	void processFrame(const Mat& frameIn, vector<Point>& playersOut);
-	void processFrameDebug(const Mat& frameIn, Mat& drawingOut);
+	void init(int argc, char** argv, bool withDebug = false, bool withControls = false) override;
+	void destroy() override;
+	void processFrame(const cv::Mat& frameIn, std::vector<cv::Point>& playersOut) override;
+	void processFrameDebug(const cv::Mat& frameIn, cv::Mat& drawingOut) override;
+	void processFrame(const cv::UMat& frameIn, std::vector<cv::Point>& playersOut) override;;
+	void processFrameDebug(const cv::UMat& frameIn, cv::Mat& drawingOut) override;
 
 private:
-	void showPlayers(const vector<vector<Point>>& contoursIn, vector<Point>& playersOut);
-	void dilateRect(int dilateSize, const Mat& filteredIn, Mat& dilatedOut);
+	static void showPlayers(const std::vector<std::vector<cv::Point>>& contoursIn, std::vector<cv::Point>& playersOut);
+	static void dilateRect(int dilateSize, const cv::Mat& filteredIn, cv::Mat& dilatedOut);
 	void addControls();
 
-	HsvRange hsvRange = { { 6, 255, 240 },{ 8, 255, 255 } };
+	cv::FilterRange hsvRange = {{6, 255, 240},{8, 255, 255}};
 	int dilateSize = 5;
 };
+
